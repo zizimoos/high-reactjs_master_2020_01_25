@@ -23,16 +23,29 @@ const Boards = styled.div`
 function App() {
   const [toDos, setToDos] = useRecoilState(todoState);
   const onDragEnd = (args: DropResult) => {
-    const { destination, source, draggableId } = args;
+    const { destination, source } = args;
     if (!destination) {
       return;
     }
     if (destination.droppableId === source.droppableId) {
-      const boardCopy = [...toDos[source.droppableId]];
-      const [removed] = boardCopy.splice(source.index, 1);
-      boardCopy.splice(destination.index, 0, removed);
-      const newToDos = { ...toDos, [source.droppableId]: boardCopy };
-      setToDos(newToDos);
+      const boardCopyArray = [...toDos[source.droppableId]];
+      const [removedElement] = boardCopyArray.splice(source.index, 1);
+      boardCopyArray.splice(destination.index, 0, removedElement);
+      const newToDosObject = { ...toDos, [source.droppableId]: boardCopyArray };
+      setToDos(newToDosObject);
+    }
+    if (destination.droppableId !== source.droppableId) {
+      const sourceArray = [...toDos[source.droppableId]];
+      const removedElement = sourceArray.splice(source.index, 1)[0];
+      // const draggedObject = sourceArray[source.index];
+      const destinationArray = [...toDos[destination.droppableId]];
+      destinationArray.splice(destination.index, 0, removedElement);
+      const newToDosObject = {
+        ...toDos,
+        [source.droppableId]: sourceArray,
+        [destination.droppableId]: destinationArray,
+      };
+      setToDos(newToDosObject);
     }
   };
   return (
